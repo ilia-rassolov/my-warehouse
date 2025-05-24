@@ -7,8 +7,8 @@ CREATE TABLE products (
     id SERIAL PRIMARY KEY,
     name VARCHAR(127) NOT NULL,
     description VARCHAR(255),
-    price DECIMAL(10,2) NOT NULL,
-    quantity_stock DECIMAL(10,1) NOT NULL
+    price INTEGER NOT NULL,
+    stock INTEGER DEFAULT 0
 );
 
 CREATE TABLE orders (

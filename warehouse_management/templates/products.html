@@ -1,30 +1,46 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container col-9 mt-3">
-    <h1 class="display">Товары</h1>
-    <table class="table table-hover table-bordered">
-        <thead>
-        <tr>
-            <th class="col-1">ID</th>
-            <th class="col-3">Название</th>
-            <th class="col-4">Описание</th>
-            <th class="col-2">Цена</th>
-            <th class="col-2">Остаток</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for row in products %}
-        <tr>
-            <td>{{ row['product_id'] }}</td>
-<!--            <td><a href="{{ url_for('product_show', id=row['product_id']) }}">{{ row['product_name'] }}</a></td>-->
-            <td><a href="/">{{ row['product_name'] }}</a></td>
-            <td>{{ row['description'] }}</td>
-            <td>{{ row['price'] }}</td>
-            <td>{{ row['quantity_stock'] }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+<div class="container wrapper flex-grow-1 mb-3">
+    <div class="card mb-3">
+        <div class="card-body bg-light">
+            <form action="{{ url_for('search_form') }}">
+                <div class="mb-3">
+                    <label class="form-label" for="get_by_id">Введите ID товара, чтобы найти его</label>
+                    <input type="number" name="id_data" max="9999" class="form-control"
+                           placeholder="ID" required="" id="get_by_id" value="">
+                </div>
+                <input class="btn btn-primary" type="submit" value="Найти товар">
+            </form>
+        </div>
+    </div>
+    <div class="container col-12 mt-3">
+        <h1 class="my-2">Товары</h1>
+        <table class="table table-hover table-bordered">
+            <thead>
+            <tr>
+                <th class="col-1">ID</th>
+                <th class="col-3">Название</th>
+                <th class="col-4">Описание</th>
+                <th class="col-2">Цена</th>
+                <th class="col-2">Остаток</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in products %}
+            <tr>
+                <td>{{ row['product_id'] }}</td>
+                <td><a href="{{ url_for('product_show', id=row['product_id']) }}">{{ row['product_name'] }}</a></td>
+                <td>{{ row['product_description'] }}</td>
+                <td>{{ row['product_price'] }}</td>
+                <td>{{ row['product_stock'] }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <form action="{{ url_for('add_product') }}" method="get">
+        <button class="btn btn-primary" type="submit">Добавить товар</button>
+    </form>
 </div>
 {% endblock %}

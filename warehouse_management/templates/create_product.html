@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container wrapper flex-grow-1">
+    <h1 class="my-2">Добавить товар</h1>
+    <div class="card mb-3">
+        <div class="card-body bg-light">
+            <form action="{{ url_for('add_product') }}" method="post">
+                <div class="mb-3">
+                    <label class="form-label" for="id_name">Название товара</label>
+                    <input type="text" name="name" maxlength="40" class="form-control"
+                           placeholder="название" required="" id="id_name" value="">
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="id_description">Описание товара</label>
+                    <input type="text" name="description" maxlength="100" class="form-control"
+                           placeholder="описание" required="" id="id_description" value="">
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="id_price">Цена товара</label>
+                    <input type="number" name="price" maxlength="10" class="form-control"
+                           placeholder="цена" required="" id="id_price" value="">
+                </div>
+                <div class="mb-1">
+                    <label class="form-label" for="id_stock">Остаток товара</label>
+                    <input type="number" name="stock" maxlength="10" class="form-control"
+                           placeholder="остаток на складе" required="" id="id_stock" value="">
+                </div>
+                <input class="btn btn-primary" type="submit" value="Создать товар">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

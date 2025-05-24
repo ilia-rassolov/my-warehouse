@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container col-9 mt-3 mb-1">
+    <h1 class="display">Изменить данные товара: {{product['name']}}</h1>
+    <form action="{{ url_for('update_product', id=product.id) }}" method="post">
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th>Название</th>
+                <th>
+                    <div class="mb-3">
+                        <label class="form-label d-none" for="id_name">Название товара</label>
+                        <input type="text" name="name" maxlength="40" class="form-control"
+                               required="" id="id_name" value="{{ product.name }}">
+                    </div></th>
+            </tr>
+            <tr>
+                <th>Описание</th>
+                <th><div class="mb-1">
+                        <label class="form-label d-none" for="id_description">Описание товара</label>
+                        <input type="text" name="description" maxlength="100" class="form-control"
+                               required="" id="id_description" value="{{ product.description }}">
+                    </div></th>
+            </tr>
+            <tr>
+                <th>Цена, руб</th>
+                <th>
+                    <div class="mb-1">
+                        <label class="form-label d-none" for="id_price">Цена товара</label>
+                        <input type="number" name="price" maxlength="10" class="form-control"
+                               required="" id="id_price" value="{{ product.price }}">
+                    </div></th>
+            </tr>
+            <tr>
+                <th>Остаток на складе</th>
+                <th>
+                    <div class="mb-1">
+                        <label class="form-label d-none" for="id_stock">Остаток товара</label>
+                        <input type="number" name="stock" maxlength="10" class="form-control"
+                               required="" id="id_stock" value="{{ product.stock }}">
+                    </div>
+                </th>
+            </tr>
+        </table>
+        <input class="btn btn-primary" type="submit" value="Изменить товар">
+    </form>
+</div>
+{% endblock %}

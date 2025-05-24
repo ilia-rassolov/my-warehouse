@@ -1,18 +1,10 @@
-from validators.url import url
-from urllib.parse import urlparse
-
-
-def validate(url_data):
+def validate(product_data):
     errors = ""
-    if not url(url_data):
-        errors = "Некорректный URL"
-    elif len(url_data) > 255:
-        errors = "URL превышает 255 символов"
+    price = int(product_data.get('price'))
+    stock = int(product_data.get('stock', int))
+    if not isinstance(price, int) or price > int(2**31 - 1) or price <= 0:
+        errors = "Цена указана некорректно"
+    elif not isinstance(stock, int) or stock > 2**31 - 1 or stock < 0:
+        errors = " Остаток указан некорректно"
     return errors
 
-
-def get_name(url):
-    scheme = urlparse(url).scheme
-    hostname = urlparse(url).hostname
-    name = f"{scheme}://{hostname}"
-    return name

@@ -1,4 +1,3 @@
-
 import psycopg2
 from psycopg2.extras import DictCursor
 from psycopg2 import OperationalError, DatabaseError
@@ -17,55 +16,59 @@ class ProductRepository:
                        products.name AS product_name,
                        products.description AS product_description,
                        products.price AS product_price,
-                       products.quantity_stock AS product_quantity_stock
+                       products.stock AS product_stock
                    FROM products
                    ORDER BY products.id;""")
             products = [dict(row) for row in curs]
         return products
 
-    # def get_content(self):
-    #     with self.conn.cursor(cursor_factory=DictCursor) as curs:
-    #         curs.execute("""
-    #         SELECT
-    #             products.id AS url_id,
-    #             products.name AS url_name
-    #         FROM products
-    #         ORDER BY products.id;""")
-    #         content = [dict(row) for row in curs]
-    #     with self.conn.cursor(cursor_factory=DictCursor) as curs:
-    #         curs.execute("""
-    #         SELECT
-    #             DISTINCT  ON(url_id)
-    #             url_id,
-    #             status_code,
-    #             created_at
-    #         FROM  url_checks
-    #         ORDER BY url_id, status_code, created_at DESC;""")
-    #         checks = [dict(row) for row in curs]
-    #     for url in content:
-    #         for check in checks:
-    #             if url["url_id"] == check["url_id"]:
-    #                 url["last_created_at"] = check["created_at"]
-    #                 url["last_status_code"] = check["status_code"]
-    #                 break
-    #     return content
-
-    def get_url_by_id(self, id):
+    def get_product_by_id(self, id):
         with self.conn.cursor(cursor_factory=DictCursor) as curs:
-            curs.execute("SELECT * FROM urls WHERE id = %s", (id,))
+            curs.execute("SELECT * FROM products WHERE id = %s", (id,))
             row = curs.fetchone()
         return dict(row) if row else None
 
-    def save_url(self, name):
+    def save(self, new_product):
+        placeholders = ', '.join(f'%({k})s' for k in new_product)
+        query = (f"""INSERT INTO products
+                          ({', '.join(new_product)}) VALUES ({placeholders})
+                          RETURNING id""")
         with self.conn.cursor(cursor_factory=DictCursor) as curs:
-            curs.execute("""INSERT INTO urls (name) VALUES
-            (%s) RETURNING id""", (name,))
+            curs.execute(query, new_product)
             id = curs.fetchone()['id']
         return id
 
+    def update(self, product_id, product_data):
+        placeholders = (
+            product_data['name'],
+            product_data['description'],
+            product_data['price'],
+            product_data['stock']
+        )
+        query = (
+            f"""
+            UPDATE products
+            SET name = %s,
+                description = %s,
+                price = %s,
+                stock = %s
+            WHERE id = {product_id};"""
+        )
+        with self.conn.cursor(cursor_factory=DictCursor) as curs:
+            curs.execute(query, placeholders)
+        return None
+
+    def delete(self, product_id):
+        with self.conn.cursor(cursor_factory=DictCursor) as curs:
+            curs.execute(f"""DELETE FROM products
+                     WHERE id = {product_id};"""
+                         )
+        return None
+
     def get_id_by_name(self, name):
         with self.conn.cursor(cursor_factory=DictCursor) as curs:
-            curs.execute("SELECT id FROM urls WHERE name = %s", (name,))
+            curs.execute(f"""SELECT id FROM products
+             WHERE name = %s;""", (name,))
             try:
                 id = curs.fetchone()['id']
             except TypeError:
@@ -73,33 +76,14 @@ class ProductRepository:
         return id
 
 
-class CheckRepository:
-    def __init__(self, conn):
-        self.conn = conn
-
-    def get_checks(self, url_id):
-        with self.conn.cursor(cursor_factory=DictCursor) as curs:
-            curs.execute("""SELECT
-                             * FROM url_checks
-                             WHERE url_id = %s ORDER BY id DESC""", (url_id,))
-            return [dict(row) for row in curs]
-
-    def save_check(self, new_check):
-        placeholders = ', '.join(f'%({k})s' for k in new_check)
-        query = (f"""INSERT INTO url_checks
-                  ({', '.join(new_check)}) VALUES ({placeholders})""")
-        with self.conn.cursor(cursor_factory=DictCursor) as curs:
-            curs.execute(query, new_check)
-
-
 class DBClient:
-    def __init__(self, db_url):
-        self.db_url = db_url
+    def __init__(self, db):
+        self.db = db
         self.conn = None
 
     def open_connection(self):
         try:
-            self.conn = psycopg2.connect(self.db_url)
+            self.conn = psycopg2.connect(self.db)
         except (OperationalError, DatabaseError) as err:
             logging.error(err)
         return self.conn

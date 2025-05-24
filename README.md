@@ -1,7 +1,6 @@
-### Hexlet tests and linter status:
-[![Actions Status](https://github.com/ilia-rassolov/python-project-83/actions/workflows/hexlet-check.yml/badge.svg)](https://github.com/ilia-rassolov/python-project-83/actions)
+### Linter status:
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/ffa0f30f16b9baf237d7/maintainability)](https://codeclimate.com/github/ilia-rassolov/python-project-83/maintainability)
+[![Maintainability](https://api.codeclimate.com/v1/badges/ffa0f30f16b9baf237d7/maintainability)](https://codeclimate.com/github/ilia-rassolov/my-warehouse/maintainability)
 
 ---
 
@@ -15,7 +14,7 @@ Flask-приложение с использованием PostgreSQL. Имит�
 
 ### Установка проекта 
 
-##### Вы можете пользоваться готовым проектом в сети: https://python-project-83-j08w.onrender.com
+##### Вы можете пользоваться готовым проектом в сети: https://my-warehouse-n4jk.onrender.com
 
 ##### Либо установить на PC:
 
@@ -23,8 +22,8 @@ Flask-приложение с использованием PostgreSQL. Имит�
 
 Скачайте проект, перейдите в директорию  
 
-`git clone git@github.com:ilia-rassolov/python-project-83.git`  
-`cd python-project-83`  
+`git clone https://github.com/ilia-rassolov/my-warehouse.git`  
+`cd my-warehouse`  
 
 Переименуйте файл .env_example в .env и измените в нём данные конфигурации  
 Например, укажите настройки Вашей PostgreSQL:  

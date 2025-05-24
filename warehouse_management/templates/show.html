@@ -1,130 +1,39 @@
 {% extends 'base.html' %}
 
 {% block content %}
-{% if messages %}
-  {% for category, message in messages %}
-    {% if category == 'repeat' %}
-      <div class="alert alert-info  flashes" role="alert">
-        {{ message }}
-      </div>
-    {% endif %}
-    {% if category == 'success' %}
-      <div class="alert alert-success flashes" role="alert">
-        {{ message }}
-      </div>
-    {% endif %}
-    {% if category == 'error' %}
-      <div class="alert alert-danger flashes" role="alert">
-        {{ message }}
-      </div>
-    {% endif %}
-  {% endfor %}
-{% endif %}
-
-<div class="container wrapper flex-grow-1">
-
-
-
-      <h1 class="my-4">
-
-Просмотр задачи
-
-      </h1>
-
-<div class="card">
-  <div class="card-header bg-secondary text-white">
-    <h2>Имя</h2>
-  </div>
-  <div class="card-body bg-light">
-    <p>Описание</p>
-    <hr>
-    <div class="container">
-      <div class="row p-1">
-        <div class="col">Автор</div>
-        <div class="col">1 1</div>
-      </div>
-      <div class="row p-1">
-        <div class="col">Исполнитель</div>
-        <div class="col">Алексей Алексеев</div>
-      </div>
-      <div class="row p-1">
-        <div class="col">Статус</div>
-        <div class="col">Op123</div>
-      </div>
-      <div class="row p-1">
-        <div class="col">Дата создания</div>
-        <div class="col">12.05.2025 18:05</div>
-      </div>
-      <div class="row p-1">
-        <div class="col">
-          <h6>Метки:</h6>
-          <ul>
-
-              <li>Oo</li>
-
-          </ul>
-        </div>
-      </div>
-      <div class="row p-1">
-        <div class="col">
-          <a href="/tasks/1/update/">Изменить</a>
-          <br>
-          <a href="/tasks/1/delete/">Удалить</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-    </div>
 
 <div class="container col-9 mt-3 mb-1">
-    <h1 class="display">Сайт: {{ url['name'] }}</h1>
-    <table class="table table-hover table-bordered" data-test="url">
+    <h1 class="display">Товар: {{ product['name'] }}</h1>
+    <table class="table table-hover table-bordered">
         <tr>
             <th>ID</th>
-            <th>{{ url['id'] }}</th>
+            <th>{{ product.id }}</th>
         </tr>
         <tr>
-            <th>Имя</th>
-            <th>{{ url['name'] }}</th>
+            <th>Название</th>
+            <th>{{ product.name }}</th>
         </tr>
         <tr>
-            <th>Дата создания</th>
-            <th>{{ url['created_at'] }}</th>
+            <th>Описание</th>
+            <th>{{ product.description }}</th>
+        </tr>
+        <tr>
+            <th>Цена, руб</th>
+            <th>{{ product.price }}</th>
+        </tr>
+        <tr>
+            <th>Остаток на складе</th>
+            <th>{{ product.stock }}</th>
         </tr>
     </table>
-</div>
-<div class="container col-9 mt-5">
-    <h2 class="display">Проверки</h2>
-    <form action="{{ url_for('add_check', id=url['id']) }}"  method="post">
+    <h2 class="display">Изменить данные о товаре</h2>
+    <form action="{{ url_for('update_product', id=product.id) }}">
         <input class="btn btn-primary btn-sm fs-6 mt-2 mb-1"
-               type="submit" value="Запустить проверку">
+               type="submit" value="Обновить информацию о товаре">
     </form>
-    <table class="table table-hover table-bordered" data-test="checks">
-        <thead>
-        <tr>
-            <th >ID</th>
-            <th>Код ответа</th>
-            <th>h1</th>
-            <th>title</th>
-            <th>description</th>
-            <th>Дата создания</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for check in checks %}
-        <tr>
-            <td>{{ check['id'] }}</td>
-            <td>{{ check['status_code'] }}</td>
-            <td>{{ check['h1'] }}</td>
-            <td>{{ check['title'] }}</td>
-            <td>{{ check['description'] }}</td>
-            <td>{{ check['created_at'] }}</td>
-        </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
+    <form action="{{ url_for('delete_product', id=product.id) }}">
+        <input class="btn btn-primary btn-sm fs-6 mt-2 mb-1"
+               type="submit" value="Удалить товар">
+    </form>
 </div>
 {% endblock %}
