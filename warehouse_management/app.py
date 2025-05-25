@@ -155,6 +155,12 @@ def order_show(id):
     flash(f"Заказ с ID {id} не существует", 'info')
     return redirect(url_for('orders'), code=302)
 
+import logging
+
+logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
+
+
 @app.route('/orders/add', methods=["GET", "POST"])
 def add_order():
     if request.method == "GET":
@@ -163,21 +169,34 @@ def add_order():
         data_create = request.form.to_dict(flat=False)
         order_status = request.form.get("status")
 
+        logger.debug(f"Received data: {data_create}")
+        quantity = request.form.getlist('quantity[]')
+        product_ids = request.form.getlist('product_id[]')
+        submit_order = request.form.getlist('submit_order')
+
+        logger.debug(f"Quantity: {quantity}, Product IDs: {product_ids}, submit_order: {submit_order}")
 
         db = DBClient(DATABASE)
         conn = db.open_connection()
 
         repo_order = OrderRepository(conn)
         repo_order_item = OrderItemRepository(conn)
-        # repo_product = ProductRepository(conn)
+        repo_product = ProductRepository(conn)
 
         order_id = repo_order.save(order_status)
         packed_data = pack(data_create, order_id)
         for order_element in packed_data:
-            errors = repo_order_item.save(order_element)
-            if errors:
-                flash(f"{errors}", 'error')
-                return render_template('orders/create_order.html', errors=errors)
+            product_id = order_element['product_id']
+            product = repo_product.get_product_by_id(product_id)
+            stock_free = product.get('stock', 0)
+            stock_need = order_element['quantity']
+            new_stock = stock_free - stock_need
+            if new_stock < 0:
+                db.close_connection()
+                flash(f"Количество товара {product.get('name', 'not exist')} недостаточно", 'error')
+                return redirect(url_for('orders'), code=302)
+            repo_product.update_stock(product_id, new_stock)
+            repo_order_item.save(order_element)
         db.commit_db()
         flash(f"Заказ с ID {order_id} успешно создан", 'success')
         db.close_connection()

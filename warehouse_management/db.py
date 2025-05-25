@@ -26,7 +26,7 @@ class ProductRepository:
         with self.conn.cursor(cursor_factory=DictCursor) as curs:
             curs.execute("SELECT * FROM products WHERE id = %s", (id,))
             row = curs.fetchone()
-        return dict(row) if row else None
+        return dict(row) if row else dict()
 
     def save(self, new_product):
         placeholders = ', '.join(f'%({k})s' for k in new_product)
@@ -74,6 +74,18 @@ class ProductRepository:
             except TypeError:
                 id = None
         return id
+
+    def update_stock(self, product_id, new_stock):
+        query = (
+            f"""
+            UPDATE products
+            SET stock = %s
+            WHERE id = {product_id};"""
+        )
+        with self.conn.cursor(cursor_factory=DictCursor) as curs:
+            curs.execute(query, (new_stock,))
+        return None
+
 
 class OrderRepository:
     def __init__(self, conn):

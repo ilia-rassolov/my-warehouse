@@ -1,9 +1,3 @@
-### Linter status:
-
-[![Maintainability](https://api.codeclimate.com/v1/badges/ffa0f30f16b9baf237d7/maintainability)](https://codeclimate.com/github/ilia-rassolov/my-warehouse/maintainability)
-
----
-
 # Мой склад
 
 ### Это моё первое тестовое задание
