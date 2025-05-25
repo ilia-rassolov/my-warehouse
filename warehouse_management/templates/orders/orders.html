@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container wrapper flex-grow-1 mb-8 pb-8">
+    <div class="card mb-3">
+        <div class="card-body bg-light">
+            <form action="{{ url_for('search_form') }}">
+                <div class="mb-3">
+                    <label class="form-label" for="get_by_id">Введите ID заказа, чтобы найти его</label>
+                    <input type="number" name="id_order_data" max="9999" class="form-control"
+                           placeholder="ID" required="" id="get_by_id" value="">
+                </div>
+                <input class="btn btn-primary" type="submit" value="Найти заказ">
+            </form>
+        </div>
+    </div>
+    <div class="container wrapper flex-grow-1 mb-3">
+        <h1 class="my-2">Заказы</h1>
+        <table class="table table-hover table-bordered">
+            <thead>
+            <tr>
+                <th class="col-2">ID</th>
+                <th class="col-4">Статус</th>
+                <th class="col-3">Создан</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in orders %}
+            <tr>
+                <td><a href="{{ url_for('order_show', id=row['order_id']) }}">{{ row['order_id'] }}</a></td>
+                <td>{{ row['order_status'] }}</td>
+                <td>{{ row['order_created_at'] }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <form action="{{ url_for('add_order') }}">
+        <button class="btn btn-primary" type="submit">Создать заказ</button>
+    </form>
+</div>
+{% endblock %}

@@ -13,13 +13,13 @@ CREATE TABLE products (
 
 CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
-    status VARCHAR(127) NOT NULL,
-    created_at DATE DEFAULT CURRENT_DATE
+    status VARCHAR(15),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE order_item (
     id SERIAL PRIMARY KEY,
-    product_id INT,
-    order_id INT,
-    quantity DECIMAL(10,1) NOT NULL
+    product_id INT NOT NULL,
+    order_id INT NOT NULL,
+    quantity INTEGER NOT NULL
 );

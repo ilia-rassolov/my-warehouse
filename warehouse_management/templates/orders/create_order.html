@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container wrapper flex-grow-1">
+    <h1 class="my-2">Создать заказ</h1>
+    <div class="card mb-3">
+        <div class="card-body bg-light">
+            <form method="post" action="{{ url_for('add_order') }}">
+                <div class="mb-3">
+                    <label for="status" class="form-label">Статус заказа</label>
+                    <select class="form-select" name="status" id="status">
+                        <option value="в процессе">в процессе</option>
+                        <option value="отправлен">отправлен</option>
+                        <option value="доставлен">доставлен</option>
+                    </select>
+                </div>
+                <div id="order-items">
+                    <div class="order-item mb-3">
+                        <label class="form-label">ID товара</label>
+                        <input type="number" class="form-control" name="product_id" required>
+                        <label class="form-label">Количество</label>
+                        <input type="number" class="form-control" name="quantity" required>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-secondary" onclick="addOrderItem()">Добавить товар</button>
+                <button type="submit" class="btn btn-primary">Создать заказ</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function addOrderItem() {
+    const orderItems = document.getElementById('order-items');
+    const newItem = document.createElement('div');
+    newItem.classList.add('order-item', 'mb-3');
+    newItem.innerHTML = `
+        <label class="form-label">ID продукта</label>
+        <input type="number" class="form-control" name="product_id" required>
+
+        <label class="form-label">Количество</label>
+        <input type="number" class="form-control" name="quantity" required>
+    `;
+    orderItems.appendChild(newItem);
+}
+</script>
+
+
+{% endblock %}

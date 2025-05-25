@@ -10,7 +10,7 @@
       <nav class="navbar navbar-dark bg-dark">
         <a class="navbar-brand ms-3" href="{{ url_for('home') }}">Мой склад</a>
         <a class="navbar-nav nav-link ms-3" href="{{ url_for('products') }}">Товары</a>
-        <a class="navbar-nav me-auto nav-link ms-3" href="/orders">Заказы</a>
+        <a class="navbar-nav me-auto nav-link ms-3" href="{{ url_for('orders') }}">Заказы</a>
       </nav>
       {% if messages %}
       {% for category, message in messages %}

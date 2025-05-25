@@ -8,7 +8,7 @@ class ProductRepository:
     def __init__(self, conn):
         self.conn = conn
 
-    def get_list(self):
+    def get_all_products(self):
         with self.conn.cursor(cursor_factory=DictCursor) as curs:
             curs.execute("""
                    SELECT
@@ -74,6 +74,68 @@ class ProductRepository:
             except TypeError:
                 id = None
         return id
+
+class OrderRepository:
+    def __init__(self, conn):
+        self.conn = conn
+
+    def get_all_orders(self):
+        with self.conn.cursor(cursor_factory=DictCursor) as curs:
+            curs.execute("""
+                   SELECT
+                       orders.id AS order_id,
+                       orders.status AS order_status,
+                       orders.created_at AS order_created_at
+                   FROM orders
+                   ORDER BY orders.id;""")
+            orders = [dict(row) for row in curs]
+        return orders
+
+    def get_order_by_id(self, id):
+        with self.conn.cursor(cursor_factory=DictCursor) as curs:
+            curs.execute("SELECT * FROM orders WHERE id = %s", (id,))
+            row = curs.fetchone()
+        return dict(row) if row else None
+
+    def save(self, order_status):
+        query = (f"""INSERT INTO orders
+                          (status) VALUES ('{order_status}')
+                          RETURNING id""")
+        with self.conn.cursor(cursor_factory=DictCursor) as curs:
+            curs.execute(query)
+            curs.execute(query, (order_status,))
+            id = curs.fetchone()['id']
+        return id
+
+    def update(self, id, order_status):
+        query = (
+            f"""
+            UPDATE orders
+            SET status = '{order_status}'
+            WHERE id = {id};"""
+        )
+        with self.conn.cursor(cursor_factory=DictCursor) as curs:
+            curs.execute(query)
+        return None
+
+class OrderItemRepository:
+    def __init__(self, conn):
+        self.conn = conn
+
+    def save(self, order_element):
+        placeholders = ', '.join(f'%({k})s' for k in order_element)
+        query = (f"""INSERT INTO order_item
+                          ({', '.join(order_element)}) VALUES ({placeholders})
+                          """)
+        with self.conn.cursor(cursor_factory=DictCursor) as curs:
+            curs.execute(query, order_element)
+        return None
+
+    def get_by_order_id(self, order_id):
+        with self.conn.cursor(cursor_factory=DictCursor) as curs:
+            curs.execute("SELECT * FROM order_item WHERE order_id = %s", (order_id,))
+            order_items = [dict(row) for row in curs]
+        return order_items
 
 
 class DBClient:

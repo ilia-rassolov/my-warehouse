@@ -3,8 +3,9 @@ from flask import (Flask, redirect, render_template, request,
 import os
 from dotenv import load_dotenv
 
-from .db import ProductRepository, DBClient
+from .db import ProductRepository, OrderRepository, OrderItemRepository, DBClient
 from .validator import validate
+from .pack_data import pack
 
 
 app = Flask(__name__)
@@ -26,26 +27,21 @@ def products():
     db = DBClient(DATABASE)
     conn = db.open_connection()
     repo_products = ProductRepository(conn)
-    products = repo_products.get_list()
+    products = repo_products.get_all_products()
     db.close_connection()
     messages = get_flashed_messages(with_categories=True)
-    return render_template('products.html', products=products, messages=messages,)
-
-@app.route('/search')
-def search_form():
-    id_data = request.args.get("id_data")
-    return redirect(url_for('product_show', id=id_data), code=302)
+    return render_template('products/products.html', products=products, messages=messages,)
 
 @app.route('/products/add', methods=["GET", "POST"])
 def add_product():
     if request.method == "GET":
-        return render_template('create_product.html')
+        return render_template('products/create_product.html')
     if request.method == "POST":
         product_data = request.form.to_dict()
         errors = validate(product_data)
         if errors:
             flash(f"{errors}", 'error')
-            return render_template('create_product.html',
+            return render_template('products/create_product.html',
                                    product=product_data), 422
         name_product = product_data.get('name')
         db = DBClient(DATABASE)
@@ -71,7 +67,7 @@ def product_show(id):
     db.close_connection()
     if product:
         messages = get_flashed_messages(with_categories=True)
-        return render_template('show.html', id=id,
+        return render_template('products/details_product.html', id=id,
                                product=product, messages=messages,)
     flash(f"Товар с ID {id} не существует", 'info')
     return redirect(url_for('products'), code=302)
@@ -84,13 +80,13 @@ def update_product(id):
         repo_products = ProductRepository(conn)
         product = repo_products.get_product_by_id(id)
         db.close_connection()
-        render_template('update_product.html', product=product), 422
+        return render_template('products/update_product.html', product=product), 422
     if request.method == "POST":
         product_data = request.form.to_dict()
         errors = validate(product_data)
         if errors:
             flash(f"{errors}", 'error')
-            return render_template('update_product.html', id=id,
+            return render_template('products/update_product.html', id=id,
                                    product=product_data), 422
         db = DBClient(DATABASE)
         conn = db.open_connection()
@@ -110,7 +106,7 @@ def delete_product(id):
         repo_products = ProductRepository(conn)
         product = repo_products.get_product_by_id(id)
         db.close_connection()
-        return render_template('delete_product.html', product=product)
+        return render_template('products/delete_product.html', product=product)
     if request.method == "POST":
         db = DBClient(DATABASE)
         conn = db.open_connection()
@@ -120,6 +116,94 @@ def delete_product(id):
         db.commit_db()
         flash(f"Товара {product['name']} успешно удален", 'success')
         return redirect(url_for('products'), code=302)
+
+
+@app.route('/search')
+def search_form():
+    id_product_data = request.args.get("id_product_data")
+    id_order_data = request.args.get("id_order_data")
+    if id_product_data:
+        return redirect(url_for('product_show', id=id_product_data), code=302)
+    elif id_order_data:
+        return redirect(url_for('order_show', id=id_order_data), code=302)
+
+
+@app.route('/orders')
+def orders():
+    db = DBClient(DATABASE)
+    conn = db.open_connection()
+    repo_orders = OrderRepository(conn)
+    orders = repo_orders.get_all_orders()
+    db.close_connection()
+    messages = get_flashed_messages(with_categories=True)
+    return render_template('orders/orders.html', orders=orders, messages=messages,)
+
+@app.route('/orders/<id>')
+def order_show(id):
+    db = DBClient(DATABASE)
+    conn = db.open_connection()
+    repo_orders = OrderRepository(conn)
+    order = repo_orders.get_order_by_id(id)
+    if order:
+        repo_order_item = OrderItemRepository(conn)
+        order_items = repo_order_item.get_by_order_id(id)
+        db.close_connection()
+        messages = get_flashed_messages(with_categories=True)
+        return render_template('orders/details_order.html',
+                               order=order, messages=messages, order_items=order_items,)
+    db.close_connection()
+    flash(f"Заказ с ID {id} не существует", 'info')
+    return redirect(url_for('orders'), code=302)
+
+@app.route('/orders/add', methods=["GET", "POST"])
+def add_order():
+    if request.method == "GET":
+        return render_template('orders/create_order.html')
+    if request.method == "POST":
+        data_create = request.form.to_dict(flat=False)
+        order_status = request.form.get("status")
+
+
+        db = DBClient(DATABASE)
+        conn = db.open_connection()
+
+        repo_order = OrderRepository(conn)
+        repo_order_item = OrderItemRepository(conn)
+        # repo_product = ProductRepository(conn)
+
+        order_id = repo_order.save(order_status)
+        packed_data = pack(data_create, order_id)
+        for order_element in packed_data:
+            errors = repo_order_item.save(order_element)
+            if errors:
+                flash(f"{errors}", 'error')
+                return render_template('orders/create_order.html', errors=errors)
+        db.commit_db()
+        flash(f"Заказ с ID {order_id} успешно создан", 'success')
+        db.close_connection()
+        return redirect(url_for('orders'), code=302)
+
+
+@app.route('/orders/<id>/status', methods=["GET", "POST"])
+def update_status(id):
+    if request.method == "GET":
+        db = DBClient(DATABASE)
+        conn = db.open_connection()
+        repo_orders = OrderRepository(conn)
+        order = repo_orders.get_order_by_id(id)
+        db.close_connection()
+        return render_template('orders/update_status.html', order=order), 422
+    if request.method == "POST":
+        status_data = request.form.get('status')
+        db = DBClient(DATABASE)
+        conn = db.open_connection()
+        repo_order = OrderRepository(conn)
+        repo_order.update(id, status_data)
+        db.commit_db()
+        db.close_connection()
+        flash(f"Статус заказа ID {id} успешно обновлен", 'success')
+        return redirect(url_for('orders'), code=302)
+
 
 @app.errorhandler(404)
 def not_found(error):

@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container col-9 mt-3 mb-1">
+    <h1 class="display">Обновить статус заказа ID {{order['id']}}</h1>
+    <form action="{{ url_for('update_status', id=order.id) }}" method="post">
+        <table class="table table-hover table-bordered">
+            <tr>
+                <th>ID заказа</th>
+                <th>{{ order.id }}</th>
+            </tr>
+            <tr>
+                <th>Статус</th>
+                <th>
+                    <select class="form-select mb-3" aria-label="Default select example" name="status">
+                        <option selected>Выберите статус</option>
+                        <option value="в процессе" {% if order['status'] == 'в процессе' %}selected{% endif %}>в процессе</option>
+                        <option value="отправлен" {% if order['status'] == 'отправлен' %}selected{% endif %}>отправлен</option>
+                        <option value="доставлен" {% if order['status'] == 'доставлен' %}selected{% endif %}>доставлен</option>
+                    </select>
+                </th>
+            </tr>
+            <tr>
+                <th>Заказ создан</th>
+                <th>{{ order.created_at }}</th>
+            </tr>
+        </table>
+        <input class="btn btn-primary" type="submit" value="Обновить статус заказа">
+    </form>
+</div>
+{% endblock %}
