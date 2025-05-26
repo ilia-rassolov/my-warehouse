@@ -67,8 +67,8 @@ class ProductRepository:
 
     def get_id_by_name(self, name):
         with self.conn.cursor(cursor_factory=DictCursor) as curs:
-            curs.execute(f"""SELECT id FROM products
-             WHERE name = %s;""", (name,))
+            curs.execute("SELECT id FROM products"
+                         " WHERE name = %s;", (name,))
             try:
                 id = curs.fetchone()['id']
             except TypeError:
@@ -115,7 +115,6 @@ class OrderRepository:
                           RETURNING id""")
         with self.conn.cursor(cursor_factory=DictCursor) as curs:
             curs.execute(query)
-            curs.execute(query, (order_status,))
             id = curs.fetchone()['id']
         return id
 
@@ -130,6 +129,7 @@ class OrderRepository:
             curs.execute(query)
         return None
 
+
 class OrderItemRepository:
     def __init__(self, conn):
         self.conn = conn
@@ -137,7 +137,8 @@ class OrderItemRepository:
     def save(self, order_item_data):
         placeholders = ', '.join(f'%({k})s' for k in order_item_data)
         query = (f"""INSERT INTO order_items
-                          ({', '.join(order_item_data)}) VALUES ({placeholders})
+                          ({', '.join(order_item_data)})
+                           VALUES ({placeholders})
                           """)
         with self.conn.cursor(cursor_factory=DictCursor) as curs:
             curs.execute(query, order_item_data)
@@ -145,7 +146,8 @@ class OrderItemRepository:
 
     def get_by_order_id(self, order_id):
         with self.conn.cursor(cursor_factory=DictCursor) as curs:
-            curs.execute("SELECT * FROM order_items WHERE order_id = %s", (order_id,))
+            curs.execute("SELECT * FROM order_items"
+                         " WHERE order_id = %s", (order_id,))
             order_items = [dict(row) for row in curs]
         return order_items
 

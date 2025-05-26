@@ -14,30 +14,18 @@
       </nav>
       {% if messages %}
       {% for category, message in messages %}
-      {% if category == 'info' %}
-      <div class="alert alert-info  flashes" role="alert">
-        {{ message }}
+      <div class="alert alert-{{ category }}  flashes" role="alert">
+          {{ message }}
       </div>
-      {% endif %}
-      {% if category == 'success' %}
-      <div class="alert alert-success flashes" role="alert">
-        {{ message }}
-      </div>
-      {% endif %}
-      {% if category == 'error' %}
-      <div class="alert alert-danger flashes" role="alert">
-        {{ message }}
-      </div>
-      {% endif %}
       {% endfor %}
       {% endif %}
       <div id="content">
         {% block content %}{% endblock %}
       </div>
-<!--      <footer>-->
-<!--          <div class="container my-5 pt-4 border-top fixed-bottom">-->
-<!--              <a target="_blank" href="https://www.ozon.ru/">Мой склад</a>-->
-<!--          </div>-->
-<!--      </footer>-->
+      <footer>
+          <div class="container my-5 pt-4 border-top fixed-bottom">
+              <a target="_blank" href="https://www.ozon.ru/">Мой склад</a>
+          </div>
+      </footer>
   </body>
 </html>
