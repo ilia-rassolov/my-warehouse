@@ -17,9 +17,9 @@
                 <div id="order-items">
                     <div class="order-item mb-3">
                         <label class="form-label">ID товара</label>
-                        <input type="number" class="form-control" name="product_id[]" required>
+                        <input type="number" class="form-control" name="product_ids_data" required>
                         <label class="form-label">Количество</label>
-                        <input type="number" class="form-control" name="quantity[]" required>
+                        <input type="number" class="form-control" name="quantity_data" required>
                     </div>
                 </div>
                 <button type="button" class="btn btn-secondary" onclick="addOrderItem()">Добавить товар</button>
@@ -36,10 +36,10 @@ function addOrderItem() {
     newItem.classList.add('order-item', 'mb-3');
     newItem.innerHTML = `
         <label class="form-label">ID продукта</label>
-        <input type="number" class="form-control" name="product_id[]" required>
+        <input type="number" class="form-control" name="product_ids_data" required>
 
         <label class="form-label">Количество</label>
-        <input type="number" class="form-control" name="quantity[]" required>
+        <input type="number" class="form-control" name="quantity_data" required>
     `;
     orderItems.appendChild(newItem);
 }

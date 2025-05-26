@@ -26,7 +26,7 @@ class ProductRepository:
         with self.conn.cursor(cursor_factory=DictCursor) as curs:
             curs.execute("SELECT * FROM products WHERE id = %s", (id,))
             row = curs.fetchone()
-        return dict(row) if row else dict()
+        return dict(row) if row else None
 
     def save(self, new_product):
         placeholders = ', '.join(f'%({k})s' for k in new_product)
@@ -134,18 +134,18 @@ class OrderItemRepository:
     def __init__(self, conn):
         self.conn = conn
 
-    def save(self, order_element):
-        placeholders = ', '.join(f'%({k})s' for k in order_element)
-        query = (f"""INSERT INTO order_item
-                          ({', '.join(order_element)}) VALUES ({placeholders})
+    def save(self, order_item_data):
+        placeholders = ', '.join(f'%({k})s' for k in order_item_data)
+        query = (f"""INSERT INTO order_items
+                          ({', '.join(order_item_data)}) VALUES ({placeholders})
                           """)
         with self.conn.cursor(cursor_factory=DictCursor) as curs:
-            curs.execute(query, order_element)
+            curs.execute(query, order_item_data)
         return None
 
     def get_by_order_id(self, order_id):
         with self.conn.cursor(cursor_factory=DictCursor) as curs:
-            curs.execute("SELECT * FROM order_item WHERE order_id = %s", (order_id,))
+            curs.execute("SELECT * FROM order_items WHERE order_id = %s", (order_id,))
             order_items = [dict(row) for row in curs]
         return order_items
 

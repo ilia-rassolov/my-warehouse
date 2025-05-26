@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS orders CASCADE;
-DROP TABLE IF EXISTS order_item CASCADE;
+DROP TABLE IF EXISTS order_items CASCADE;
 
 
 CREATE TABLE products (
@@ -17,7 +17,7 @@ CREATE TABLE orders (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE order_item (
+CREATE TABLE order_items (
     id SERIAL PRIMARY KEY,
     product_id INT NOT NULL,
     order_id INT NOT NULL,

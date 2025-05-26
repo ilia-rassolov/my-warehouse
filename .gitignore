@@ -1,6 +1,7 @@
 .venv
-/__pycache__/**
+warehouse_management/__pycache__/**
 .env
-idea/
+.idea
+
 
 my_stat
