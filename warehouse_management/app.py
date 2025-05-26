@@ -4,7 +4,6 @@ import os
 from dotenv import load_dotenv
 
 from .db import ProductRepository, OrderRepository, OrderItemRepository, DBClient
-from .validator import validate
 from .pack_data import pack
 
 
@@ -38,11 +37,6 @@ def add_product():
         return render_template('products/create_product.html')
     if request.method == "POST":
         product_data = request.form.to_dict()
-        errors = validate(product_data)
-        if errors:
-            flash(f"{errors}", 'error')
-            return render_template('products/create_product.html',
-                                   product=product_data), 422
         name_product = product_data.get('name')
         db = DBClient(DATABASE_URL)
         conn = db.open_connection()
@@ -83,11 +77,6 @@ def update_product(id):
         return render_template('products/update_product.html', product=product), 422
     if request.method == "POST":
         product_data = request.form.to_dict()
-        errors = validate(product_data)
-        if errors:
-            flash(f"{errors}", 'error')
-            return render_template('products/update_product.html', id=id,
-                                   product=product_data), 422
         db = DBClient(DATABASE_URL)
         conn = db.open_connection()
         repo_product = ProductRepository(conn)
